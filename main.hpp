@@ -1,17 +1,21 @@
 #ifndef MAIN_HPP
 #define MAIN_HPP
 #include <iostream>
+#include <cmath>
 using namespace std;
+const int D = 2;
+
 
 class Particle{
     public:
-        double position[3];
-        double speed[3];
-        double force[3];
+        double mass;
+        double position[D];
+        double speed[D];
+        double force[D];
         double ** film;
         int film_length;
         Particle * next;
-
+        
 
 };
 
@@ -19,12 +23,35 @@ class Particle{
 class Box{
     public:
         int niveau;
-        double center[3];
-        double barycentre[3];
+        int nb_filles;
+        double center[D];
+        double barycentre[D];
         double mass;
         Particle * particle;
         Box * daughter;
         Box * sister;
+        Box(); //création de la première boite, la plus grande, de niveau 0 et centrée
+        Box(Box * parent); //création des boites filles à partir de la boite mère
 };
+Box:: Box(){
+    this->niveau = 0;
+    this->center[0] = 0.0;
+    this->center[1] = 0.0;
+    this->center[2] = 0.0;
+    this->barycentre[0] = 0.0;
+    this->barycentre[1] = 0.0;
+    this->barycentre[2] = 0.0;
+    this->mass = 0.0;
+    this->particle = NULL;
+    this->daughter = NULL;
+    this->sister = NULL;
+}
 
+Box :: Box(Box * parent){
+    if (parent->nb_filles >= pow(2,D)){
+        cout << "Erreur : création d'une boîte fille alors que la boîte mère est pleine" << endl;
+        exit(1);
+    }
+
+}
 #endif // MAIN_HPP
