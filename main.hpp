@@ -16,4 +16,15 @@ class Particle{
 };
 
 
+class Box{
+    public:
+        int niveau;
+        double center[3];
+        double barycentre[3];
+        double mass;
+        Particle * particle;
+        Box * daughter;
+        Box * sister;
+};
+
 #endif // MAIN_HPP
