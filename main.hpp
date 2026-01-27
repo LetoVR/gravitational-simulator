@@ -35,12 +35,10 @@ class Box{
 };
 Box:: Box(){
     this->niveau = 0;
-    this->center[0] = 0.0;
-    this->center[1] = 0.0;
-    this->center[2] = 0.0;
-    this->barycentre[0] = 0.0;
-    this->barycentre[1] = 0.0;
-    this->barycentre[2] = 0.0;
+    for(int i=0; i<D; i++){
+        this->center[i] = 0.0;
+        this->barycentre[i] = 0.0;
+    }
     this->mass = 0.0;
     this->particle = NULL;
     this->daughter = NULL;
