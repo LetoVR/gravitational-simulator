@@ -118,6 +118,26 @@ inline coord forceTotaleSurParticule(Particule* particule) {
 
     return Ftot;
 }
+inline Particule* creerSysteme(int N) {
+    if (N <= 0) return nullptr;
+
+    Particule* p0 = new Particule();
+    Particule* courant = p0;
+
+    for (int i = 1; i < N; ++i) {
+        Particule* p = new Particule(
+            {double(rand()) / RAND_MAX, double(rand()) / RAND_MAX},
+            {0.0, 0.0},
+            1.0
+        );
+        courant->particule_suivante = p;
+        courant = p;
+    }
+
+    courant->particule_suivante = p0; // liste circulaire
+    return p0;
+}
+
 /*class Box{
     public:
         int niveau;
