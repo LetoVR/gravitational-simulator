@@ -142,7 +142,7 @@ Particule* creerSysteme(int N) {
 
         coord v = zeros();
         coord f = zeros();
-        double m = 1.0; // ou une valeur aléatoire / lue depuis un fichier
+        double m = 1.0; // ou une valeur aléatoire
 
         Particule* np = new Particule(p, v, m, f, nullptr);
         courant->particule_suivante = np;
@@ -152,4 +152,30 @@ Particule* creerSysteme(int N) {
     // fermer la liste circulaire
     courant->particule_suivante = head;
     return head;
+}
+Particule* copie_liste(Particule* p0) {
+    if (!p0) return nullptr;
+
+    // 1) Copier la première particule
+    Particule* new_head = new Particule(p0->position, p0->vitesse, p0->masse_p, p0->force, nullptr);
+    new_head->liste_position = p0->liste_position;   // deep copy automatique (std::vector)
+
+    Particule* prev_new = new_head;
+    Particule* cur_old  = p0->particule_suivante;
+
+    // 2) Copier les suivantes jusqu'à revenir à p0
+    while (cur_old && cur_old != p0) {
+        Particule* node = new Particule(cur_old->position, cur_old->vitesse, cur_old->masse_p, cur_old->force, nullptr);
+        node->liste_position = cur_old->liste_position;
+
+        prev_new->particule_suivante = node;
+        prev_new = node;
+
+        cur_old = cur_old->particule_suivante;
+    }
+
+    // 3) Fermer la liste circulaire
+    prev_new->particule_suivante = new_head;
+
+    return new_head;
 }

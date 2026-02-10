@@ -57,5 +57,6 @@ public:
 coord forceEntreParticules(const Particule* p1, const Particule* p2);
 coord forceTotaleSurParticule(Particule* particule);
 Particule* creerSysteme(int N);
+Particule* copie_liste(Particule* p0);
 
 #endif // PARTICULE_HPP
