@@ -1,42 +1,61 @@
 #ifndef PARTICULE_HPP
 #define PARTICULE_HPP
-#include <stdio.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include <array>
+#include <cstdlib>  
 
-using namespace std;
-const int D = 2;// Dimension de la simulation (2D)
-struct coord {
-    double x, y; // Coordonnées dans le plan
-};
+constexpr int D = 2; //dimension on peut changer en 3, 4...
+using coord = std::array<double, D>;
+
+inline coord zeros() {
+    coord z{};
+    z.fill(0.0);
+    return z;
+}
+
+inline double norm2(const coord& a) {
+    double s = 0.0;
+    for (int i = 0; i < D; ++i) s += a[i] * a[i];
+    return s;
+}
+
 // _____________________________________________________________________________________
 // CLASSE PARTICULE
 class Particule {
 public:
-    coord position;       // Position instantanée 
-    coord vitesse;        // Vitesse instantanée
-    coord force;          // Force gravitationnelle subie 
-    double masse_p;       // Masse de la particule 
-    
-    std::vector<coord> liste_position; // Historique pour le film Matlab 
-    Particule* particule_suivante;     // Pour la liste chaînée 
+    coord position;
+    coord vitesse;
+    coord force;
+    double masse_p;
+    Particule* particule_suivante;
+    std::vector<coord> liste_position;
 
-    // Constructeur avec valeurs par défaut
-    Particule(coord p = {0.,0.}, coord v = {0., 0.}, double m = 1., coord f = {0.,0.}, Particule* p_s = nullptr);
+    // Constructeur OBLIGATOIRE: on force m
+    Particule(const coord& p, const coord& v, double m, const coord& f, Particule* next = nullptr);
 
-    // Méthodes demandées
+    // Méthodes
     void deplacer(const coord& new_pos);
     void ajouter_position(const coord& pos);
-    void saute_mouton(double delta_t); // Implémente l'ordre 2 stable 
+    void saute_mouton(double delta_t);
     void print() const;
-    void print_liste() const; // afficher des infos sur la liste de particules en partant de celle-ci
+    void print_liste() const;
+
+    // Getters 
+    double getMasse() const;
+    const coord& getPosition() const;
+    const coord& getVitesse() const;
+    const coord& getForce() const;
+    Particule* getSuivante();
+    const Particule* getSuivante() const;
 };
 
-// Force exercée par p2 sur p1 (gravitation)
+// Fonctions globales
 coord forceEntreParticules(const Particule* p1, const Particule* p2);
-// Force totale subie par une particule (somme des forces de toutes les autres)
 coord forceTotaleSurParticule(Particule* particule);
-Particule* creerSysteme(int N) ;
+Particule* creerSysteme(int N);
+
 #endif // PARTICULE_HPP

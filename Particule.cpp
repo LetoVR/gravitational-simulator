@@ -1,46 +1,69 @@
-#include "PARTICULE.HPP" 
+#include "PARTICULE.HPP"
 #include <cmath>
-#include <random>
- 
-Particule::Particule(coord p = {0.,0.}, coord v = {0., 0.}, double m = 1., coord f = {0.,0.}, Particule* p_s = nullptr)
-    : position(p), vitesse(v), masse_p(m), force(f), particule_suivante(p_s) {
-        liste_position.push_back(position);
-    }
+#include <cstdlib>   // rand, RAND_MAX
+#include <iostream>
 
+using namespace std;
 
-void Particule::deplacer(const coord& new_pos) { position=new_pos; }
+//Constructeur
+Particule::Particule(const coord& p, const coord& v, double m, const coord& f, Particule* next)
+    : position(p), vitesse(v), force(f), masse_p(m), particule_suivante(next)
+{
+    liste_position.push_back(position);
+}
+
+//  Getters 
+double Particule::getMasse() const { return masse_p; }
+const coord& Particule::getPosition() const { return position; }
+const coord& Particule::getVitesse() const { return vitesse; }
+const coord& Particule::getForce() const { return force; }
+Particule* Particule::getSuivante() { return particule_suivante; }
+const Particule* Particule::getSuivante() const { return particule_suivante; }
+
+//  Méthodes 
+void Particule::deplacer(const coord& new_pos) {
+    position = new_pos;
+}
 
 void Particule::ajouter_position(const coord& pos) {
     liste_position.push_back(pos);
 }
-void Particule::saute_mouton(double delta_t) {
-    // Calcul de l'accélération
-    double ax = force.x / masse_p;
-    double ay = force.y / masse_p;
 
-    // Intégration vitesse (demi-pas)
-    vitesse.x += ax * delta_t * 0.5;
-    vitesse.y += ay * delta_t * 0.5;
+void Particule::saute_mouton(double dt) {
+    // demi-pas vitesse : v += (F/m) * dt/2
+    for (int i = 0; i < D; ++i) {
+        vitesse[i] += (force[i] / masse_p) * dt * 0.5;
+    }
 
-    // Intégration position (pas complet)
-    position.x += vitesse.x * delta_t;
-    position.y += vitesse.y * delta_t;
+    // pas position : x += v * dt
+    for (int i = 0; i < D; ++i) {
+        position[i] += vitesse[i] * dt;
+    }
 
-    // Intégration vitesse (demi-pas)
-    vitesse.x += ax * delta_t * 0.5;
-    vitesse.y += ay * delta_t * 0.5;
+    // Historique (film Matlab)
+    ajouter_position(position);
+
+    // demi-pas vitesse (⚠️ en gravitation "exacte", il faudrait recalculer force après le déplacement,
+    // puis faire ce demi-pas avec F_{k+1}. Cela se fait généralement dans la boucle du système.)
+    for (int i = 0; i < D; ++i) {
+        vitesse[i] += (force[i] / masse_p) * dt * 0.5;
+    }
 }
 
 void Particule::print() const {
-    cout << "Position: (" << position.x << ", " << position.y << "), "
-         << "Vitesse: (" << vitesse.x << ", " << vitesse.y << "), "
-         << "Masse: " << masse_p << endl;
+    cout << "Position: (";
+    for (int i = 0; i < D; ++i) cout << position[i] << (i + 1 < D ? ", " : "");
+    cout << "), Vitesse: (";
+    for (int i = 0; i < D; ++i) cout << vitesse[i] << (i + 1 < D ? ", " : "");
+    cout << "), Masse: " << masse_p << endl;
 }
+
 void Particule::print_liste() const {
     const Particule* current = this;
 
-    // sécurité si liste mal construite
-    if (!particule_suivante) {
+    if (!current) return;
+
+    if (!current->particule_suivante) {
         current->print();
         cout << "Fin de la liste des particules." << endl;
         return;
@@ -53,60 +76,80 @@ void Particule::print_liste() const {
 
     cout << "Fin de la liste des particules." << endl;
 }
-// Force exercée par p2 sur p1 (gravitation)
+
+// Forces
 coord forceEntreParticules(const Particule* p1, const Particule* p2) {
-    coord F{0.0, 0.0};
+    coord F = zeros();
     if (!p1 || !p2) return F;
 
-    const double G = 1.0;     // à adapter si nécessaire
-    const double eps = 1e-12; // évite division par 0
+    const double G = 1.0;
+    const double eps = 1e-12;
 
-    double dx = p2->position.x - p1->position.x;
-    double dy = p2->position.y - p1->position.y;
+    // d = r2 - r1 (vecteur en D dimensions)
+    coord d = zeros();
+    for (int i = 0; i < D; ++i) {
+        d[i] = p2->position[i] - p1->position[i];
+    }
 
-    double r2 = dx*dx + dy*dy + eps;
+    double r2 = norm2(d) + eps;
     double r  = std::sqrt(r2);
 
-    // F = G*m1*m2 / r^3 * (dx,dy)
+    // F = G*m1*m2 / r^3 * d
     double facteur = G * p1->masse_p * p2->masse_p / (r2 * r);
 
-    F.x = facteur * dx;
-    F.y = facteur * dy;
+    for (int i = 0; i < D; ++i) {
+        F[i] = facteur * d[i];
+    }
 
     return F;
 }
-// Force totale subie par une particule (somme des forces de toutes les autres)
+
 coord forceTotaleSurParticule(Particule* particule) {
-    coord Ftot{0.0, 0.0};
+    coord Ftot = zeros();
     if (!particule || !particule->particule_suivante) return Ftot;
 
     Particule* courant = particule->particule_suivante;
-
     while (courant && courant != particule) {
         coord F = forceEntreParticules(particule, courant);
-        Ftot.x += F.x;
-        Ftot.y += F.y;
+        for (int i = 0; i < D; ++i) {
+            Ftot[i] += F[i];
+        }
         courant = courant->particule_suivante;
     }
 
     return Ftot;
 }
+
+//  Création du système
 Particule* creerSysteme(int N) {
     if (N <= 0) return nullptr;
 
-    Particule* p0 = new Particule();
-    Particule* courant = p0;
+    // 1ère particule (tête)
+    coord p0 = zeros();
+    coord v0 = zeros();
+    coord f0 = zeros();
+    double m0 = 1.0; // tu choisis une masse ici (obligatoire de passer une valeur)
 
+    Particule* head = new Particule(p0, v0, m0, f0, nullptr);
+    Particule* courant = head;
+
+    // autres particules
     for (int i = 1; i < N; ++i) {
-        Particule* p = new Particule(
-            {double(rand()) / RAND_MAX, double(rand()) / RAND_MAX},
-            {0.0, 0.0},
-            1.0
-        );
-        courant->particule_suivante = p;
-        courant = p;
+        coord p = zeros();
+        for (int k = 0; k < D; ++k) {
+            p[k] = double(rand()) / RAND_MAX;
+        }
+
+        coord v = zeros();
+        coord f = zeros();
+        double m = 1.0; // ou une valeur aléatoire / lue depuis un fichier
+
+        Particule* np = new Particule(p, v, m, f, nullptr);
+        courant->particule_suivante = np;
+        courant = np;
     }
 
-    courant->particule_suivante = p0; // liste circulaire
-    return p0;
+    // fermer la liste circulaire
+    courant->particule_suivante = head;
+    return head;
 }
