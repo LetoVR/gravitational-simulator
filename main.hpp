@@ -169,10 +169,7 @@ Box :: Box(Box * parent){
         exit(1);
     }
 
-<<<<<<< HEAD
 }
 #endif // MAIN_HPP
-=======
 }*/
 #endif // MAIN_HPP
->>>>>>> origin/Jude-seance4
