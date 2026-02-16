@@ -11,6 +11,8 @@
 constexpr int D = 2; //dimension on peut changer en 3, 4...
 using coord = std::array<double, D>;
 
+
+// Explique ces structure Jude stp - Leto
 inline coord zeros() {
     coord z{};
     z.fill(0.0);

@@ -30,7 +30,7 @@ bool Boite::estTerminale() const {
 
 // Vérifie si la boîte est vide
 bool Boite::estVide() const {
-    return (/*particule == nullptr &&*/ premiereFille == nullptr);
+    return ( particule == nullptr && premiereFille == nullptr);
 }
 
 // Ajout d'une particule (procédure récursive)

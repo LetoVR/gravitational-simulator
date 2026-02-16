@@ -1,6 +1,8 @@
 // Fichier des tests de fonctions
 
 #include "Boite.hpp"
+#include "Particule.hpp"
+
 
 void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
@@ -31,6 +33,24 @@ void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     }
 }
 
+void dessinerParticules(sf::RenderWindow& window, const Particule* p) {
+    if (p == nullptr) return;
+
+    // Dessiner la particule courante
+    sf::CircleShape cercle(3.0f); // Rayon de 3 pixels
+    cercle.setFillColor(sf::Color::Red);
+    cercle.setPosition(p->position[0] - 3.0f, p->position[1] - 3.0f); // Centrer le cercle
+    window.draw(cercle);
+
+    // Dessiner les particules suivantes dans la liste
+    const Particule* suivant = p->getSuivante();
+    while (suivant != nullptr && suivant != p) {
+        cercle.setPosition(suivant->position[0] - 3.0f, suivant->position[1] - 3.0f);
+        window.draw(cercle);
+        suivant = suivant->getSuivante();
+    }
+}
+
 int main() {
     const int largeur = 800;
     const int hauteur = 800;
@@ -39,6 +59,9 @@ int main() {
     // Initialisation de la boîte racine centrée
     std::vector<double> centreRacine = {largeur / 2.0, hauteur / 2.0};
     Boite racine(0, centreRacine, 600.0, 2); // Niveau 0, taille 600, 2D
+
+    // Initialisation de quelques particules pour tester l'affichage
+    Particule* systeme = creerSysteme(10); // Crée un système de 10 particules
 
     // Boucle principale
     while (window.isOpen()) {
@@ -72,10 +95,12 @@ int main() {
                     // Clic droit : Suppression (Nettoyage)
                     // Note : Pour supprimer une boite spécifique, il faudrait 
                     // modifier le parent. Ici, on peut tester ton nettoyeur.
-                    // (Nécessite que estVide() soit implémenté)
+                    // (Nécessite que estVide() soit implémentée)
                     racine.nettoyerBoitesVides(); 
                 }
             }
+
+
         }
     }
 

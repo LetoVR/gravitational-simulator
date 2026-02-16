@@ -1,10 +1,11 @@
 #ifndef BOITE_HPP
 #define BOITE_HPP
 
-//#include "Particule.hpp"
+#include "Particule.hpp"
 #include <vector>
 #include <SFML/Graphics.hpp>
-
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 
 class Boite {
 private:
@@ -12,7 +13,7 @@ private:
     std::vector<double> centre;     // Centre de la boîte (x, y, z)
     std::vector<double> centreMasse;// Centre de masse des particules contenues
     double masse;                   // Masse cumulée
-    //Particule* particule;           // Pointeur vers particule si terminale 
+    Particule* particule;           // Pointeur vers particule si terminale 
     Boite* premiereFille;           // Pointeur vers première sous-boîte
     Boite* soeur;                   // Pointeur vers boîte soeur
     double taille;                  // Taille de la boîte
@@ -24,8 +25,8 @@ public:
     ~Boite();
     
     // Méthodes principales
-    //void ajouterParticule(Particule* p);
-    //void supprimerParticule(Particule* p);
+    void ajouterParticule(Particule* p);
+    void supprimerParticule(Particule* p);
     void calculerForces(Boite* autre, double theta = 0.5);
     void mettreAJourCentreMasse();
     
@@ -37,16 +38,16 @@ public:
     double getMasse() const { return masse; }
     Boite* getPremiereFille() const { return premiereFille; }
     Boite* getSoeur() const { return soeur; }
-    //Particule* getParticule() const { return particule; }
+    Particule* getParticule() const { return particule; }
     
     // Setters
     void setSoeur(Boite* s) { soeur = s; }
-    //void setPremiereFille(Boite* f) { premiereFille = f; } non utilisée finalement
+    // void setPremiereFille(Boite* f) { premiereFille = f; } non utilisée finalement
     
     // Méthodes utilitaires
     bool estTerminale() const;
     bool estVide() const;
-    //bool contientParticule(const Particule* p) const;
+    bool contientParticule(const Particule* p) const;
     std::vector<double> calculerDistance(const Boite* autre) const; //Calcul la distance entre les centres de masse de deux boîtes
     void diviserBoite();
     void nettoyerBoitesVides();
