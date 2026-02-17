@@ -34,48 +34,48 @@ bool Boite::estVide() const {
 }
 
 // Ajout d'une particule (procédure récursive)
-// void Boite::ajouterParticule(Particule* p) {
-//     // Cas 1: Boîte terminale vide
-//     if (estTerminale() && particule == nullptr) {
-//         particule = p;
-//         masse = p->getMasse();   // getMasse et getPosition à définir par Jude
-//         centreMasse = p->getPosition();
-//         return;
-//     }
+void Boite::ajouterParticule(Particule* p) {
+    // Cas 1: Boîte terminale vide
+    if (estTerminale() && particule == nullptr) {
+        particule = p;
+        masse = p->getMasse();   // getMasse et getPosition à définir par Jude
+        centreMasse = p->getPosition();
+        return;
+    }
     
-//     // Cas 2: Boîte terminale déjà occupée
-//     if (estTerminale() && particule != nullptr) {
-//         // Sauvegarde de l'ancienne particule
-//         Particule* ancienneParticule = particule;
-//         particule = nullptr;
+    // Cas 2: Boîte terminale déjà occupée
+    if (estTerminale() && particule != nullptr) {
+        // Sauvegarde de l'ancienne particule
+        Particule* ancienneParticule = particule;
+        particule = nullptr;
         
-//         // Division de la boîte
-//         diviserBoite();
+        // Division de la boîte
+        diviserBoite();
         
-//         // Ajout des deux particules
-//         ajouterParticule(ancienneParticule);
-//         ajouterParticule(p);
-//         return;
-//     }
+        // Ajout des deux particules
+        ajouterParticule(ancienneParticule);
+        ajouterParticule(p);
+        return;
+    }
     
-//     // Cas 3: Boîte avec sous-boîtes
-//     if (!estTerminale()) {
-//         int indice = getIndiceSousBoite(p->getPosition());
+    // Cas 3: Boîte avec sous-boîtes
+    if (!estTerminale()) {
+        int indice = getIndiceSousBoite(p->getPosition());
         
-//         // Parcours des sous-boîtes pour trouver la bonne
-//         Boite* sousBoite = premiereFille;
-//         for (int i = 0; i < indice && sousBoite != nullptr; i++) {
-//             sousBoite = sousBoite->getSoeur();
-//         }
+        // Parcours des sous-boîtes pour trouver la bonne
+        Boite* sousBoite = premiereFille;
+        for (int i = 0; i < indice && sousBoite != nullptr; i++) {
+            sousBoite = sousBoite->getSoeur();
+        }
         
-//         if (sousBoite != nullptr) {
-//             sousBoite->ajouterParticule(p);
+        if (sousBoite != nullptr) {
+            sousBoite->ajouterParticule(p);
             
-//             // Mise à jour du centre de masse et de la masse
-//             mettreAJourCentreMasse();
-//         }
-//     }
-// }
+            // Mise à jour du centre de masse et de la masse
+            mettreAJourCentreMasse();
+        }
+    }
+}
 
 // Suppression d'une particule
 void Boite::supprimerParticule(Particule* p) {
