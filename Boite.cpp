@@ -6,10 +6,10 @@
 using namespace std;
 
 // Constructeur
-Boite::Boite(int niv, vector<double> cent, double t, int dim) 
-    : niveau(niv), centre(cent), taille(t), dimension(dim) {
+Boite::Boite(int niv, coord cent, double t) 
+    : niveau(niv), centre(cent), taille(t) {
     
-    centreMasse = vector<double>(dimension, 0.0);
+    centreMasse = zeros();
     masse = 0.0;
     //particule = nullptr;
     premiereFille = nullptr;
@@ -78,88 +78,83 @@ bool Boite::estVide() const {
 // }
 
 // Suppression d'une particule
-// void Boite::supprimerParticule(Particule* p) {
-//     // Si la particule est dans cette boîte terminale
-//     if (estTerminale() && particule == p) {
-//         particule = nullptr;
-//         masse = 0.0;
-//         centreMasse = vector<double>(dimension, 0.0);
-//         return;
-//     }
+void Boite::supprimerParticule(Particule* p) {
+    // Si la particule est dans cette boîte terminale
+    if (estTerminale() && particule == p) {
+        particule = nullptr;
+        masse = 0.0;
+        centreMasse = zeros();
+        return;
+    }
     
-//     // Si la boîte a des sous-boîtes
-//     if (!estTerminale()) {
-//         Boite* sousBoite = premiereFille;
-//         while (sousBoite != nullptr) {
-//             sousBoite->supprimerParticule(p);
-//             sousBoite = sousBoite->getSoeur();
-//         }
+    // Si la boîte a des sous-boîtes
+    if (!estTerminale()) {
+        Boite* sousBoite = premiereFille;
+        while (sousBoite != nullptr) {
+            sousBoite->supprimerParticule(p);
+            sousBoite = sousBoite->getSoeur();
+        }
         
-//         // Nettoyage des sous-boîtes vides
-//         nettoyerBoitesVides();
-//         mettreAJourCentreMasse();
-//     }
-// }
+        // Nettoyage des sous-boîtes vides
+        nettoyerBoitesVides();
+        mettreAJourCentreMasse();
+    }
+}
 
 // Calcul des forces entre boîtes
-// void Boite::calculerForces(Boite* autre, double theta) {
-//     // Si cette boîte est vide, on ne fait rien
-//     if (estVide()) return;
+void Boite::calculerForces(Boite* autre, double theta) {
+    // Si cette boîte est vide, on ne fait rien
+    if (estVide()) return;
     
-//     // Si l'autre boîte est vide, on ne fait rien
-//     if (autre->estVide()) return;
+    // Si l'autre boîte est vide, on ne fait rien
+    if (autre->estVide()) return;
     
-//     // Calcul de la distance entre les centres de masse
-//     vector<double> dist = calculerDistance(autre);
-//     double distance = 0.0;
-//     for (int i = 0; i < dimension; i++) {
-//         distance += dist[i] * dist[i];
-//     }
-//     distance = sqrt(distance);
+    // Calcul de la distance entre les centres de masse
+    double dist = calculerDistance(autre);
     
-//     // Critère d'approximation
-//     if (autre->estTerminale() || (autre->getTaille() / distance < theta)) {
-//         // Formule exacte pour les particules proches
-//         if (estTerminale() && autre->estTerminale() && particule != nullptr && 
-//             autre->getParticule() != nullptr && particule != autre->getParticule()) {
+    // Critère d'approximation
+    if (autre->estTerminale() || (autre->getTaille() / distance < theta)) {
+        // Formule exacte pour les particules proches
+        if (estTerminale() && autre->estTerminale() && particule != nullptr && 
+            autre->getParticule() != nullptr && particule != autre->getParticule()) {
             
-//             // Calcul de la force gravitationnelle
-//             vector<double> pos1 = particule->getPosition();
-//             vector<double> pos2 = autre->getParticule()->getPosition();
+            // Calcul de la force gravitationnelle
+            coord pos1 = particule->getPosition();
+            coord pos2 = autre->getParticule()->getPosition();
             
-//             double r2 = 0.0;
-//             for (int i = 0; i < dimension; i++) {
-//                 double diff = pos1[i] - pos2[i];
-//                 r2 += diff * diff;
-//             }
+            double r2 = 0.0;
+            for (int i = 0; i < dimension; i++) {
+                double diff = pos1[i] - pos2[i];
+                r2 += diff * diff;
+            }
             
-//             // Éviter la singularité (ε² dans la formule)
-//             double epsilon = 0.01;
-//             double force = particule->getMasse() * autre->getParticule()->getMasse() / 
-//                           (r2 + epsilon * epsilon);
+            // Éviter la singularité (ε² dans la formule)
+            double epsilon = 0.01;
+            double force = particule->getMasse() * autre->getParticule()->getMasse() / 
+                          (r2 + epsilon * epsilon);
             
-//             // Ici, on doit mettre à jour la force appliquée à la particule ( à discuter avec Jude)
-//         }
-//     } else {
-//         // Formule approchée pour les boîtes lointaines
-//         if (estTerminale() && particule != nullptr) {
-//             double force = particule->getMasse() * autre->getMasse() / 
-//                           (distance * distance);
+            // Ici, on doit mettre à jour la force appliquée à la particule ( à discuter avec Jude)
+        }
+    } else {
+        // Formule approchée pour les boîtes lointaines
+        if (estTerminale() && particule != nullptr) {
+            double force = particule->getMasse() * autre->getMasse() / 
+                          (distance * distance);
             
-//             // Mise à jour approximative de la force
-//             // À adapter selon votre implémentation
-//         }
+            // Mise à jour approximative de la force
+            // À adapter selon votre implémentation
+        }
         
-//         // Appel récursif sur les sous-boîtes
-//         if (!autre->estTerminale()) {
-//             Boite* sousBoite = autre->getPremiereFille();
-//             while (sousBoite != nullptr) {
-//                 calculerForces(sousBoite, theta);
-//                 sousBoite = sousBoite->getSoeur();
-//             }
-//         }
-//     }
-// }
+        // Appel récursif sur les sous-boîtes
+        if (!autre->estTerminale()) {
+            Boite* sousBoite = autre->getPremiereFille();
+            while (sousBoite != nullptr) {
+                calculerForces(sousBoite, theta);
+                sousBoite = sousBoite->getSoeur();
+            }
+        }
+    }
+}
 
 // Division d'une boîte en sous-boîtes
 void Boite::diviserBoite() {
@@ -172,7 +167,7 @@ void Boite::diviserBoite() {
     
     Boite* precedent = nullptr;
     for (int i = 0; i < nbSousBoites; i++) {
-        vector<double> nouveauCentre = getCentreSousBoite(i);
+        coord nouveauCentre = getCentreSousBoite(i);
         Boite* nouvelleBoite = new Boite(niveau + 1, nouveauCentre, nouvelleTaille, dimension);
         
         if (i == 0) {
@@ -185,9 +180,9 @@ void Boite::diviserBoite() {
 }
 
 // Obtention de l'indice de la sous-boîte pour une position donnée
-int Boite::getIndiceSousBoite(const vector<double>& position) const {
+int Boite::getIndiceSousBoite(const coord& position) const {
     int indice = 0;
-    for (int i = 0; i < dimension; i++) {
+    for (int i = 0; i < D; i++) {
         if (position[i] > centre[i]) {
             indice |= (1 << i);
         }
@@ -196,11 +191,11 @@ int Boite::getIndiceSousBoite(const vector<double>& position) const {
 }
 
 // Calcul du centre d'une sous-boîte
-vector<double> Boite::getCentreSousBoite(int indice) const {
-    vector<double> nouveauCentre = centre;
+coord Boite::getCentreSousBoite(int indice) const {
+    coord nouveauCentre = centre;
     double demiTaille = taille / 4.0; // Car taille/2 pour le déplacement
     
-    for (int i = 0; i < dimension; i++) {
+    for (int i = 0; i < D; i++) {
         if (indice & (1 << i)) {
             nouveauCentre[i] += demiTaille;
         } else {
@@ -211,46 +206,46 @@ vector<double> Boite::getCentreSousBoite(int indice) const {
 }
 
 // Mise à jour du centre de masse
-// void Boite::mettreAJourCentreMasse() {
-//     if (estTerminale()) {
-//         if (particule != nullptr) {
-//             centreMasse = particule->getPosition();
-//             masse = particule->getMasse();
-//         } else {
-//             centreMasse = vector<double>(dimension, 0.0);
-//             masse = 0.0;
-//         }
-//         return;
-//     }
+void Boite::mettreAJourCentreMasse() {
+    if (estTerminale()) {
+        if (particule != nullptr) {
+            centreMasse = particule->getPosition();
+            masse = particule->getMasse();
+        } else {
+            centreMasse = zeros();
+            masse = 0.0;
+        }
+        return;
+    }
     
-//     // Calcul à partir des sous-boîtes
-//     double masseTotale = 0.0;
-//     vector<double> centreMasseTotal(dimension, 0.0);
+    // Calcul à partir des sous-boîtes
+    double masseTotale = 0.0;
+    coord centreMasseTotal = zeros();
     
-//     Boite* sousBoite = premiereFille;
-//     while (sousBoite != nullptr) {
-//         if (sousBoite->getMasse() > 0) {
-//             double m = sousBoite->getMasse();
-//             masseTotale += m;
+    Boite* sousBoite = premiereFille;
+    while (sousBoite != nullptr) {
+        if (sousBoite->getMasse() > 0) {
+            double m = sousBoite->getMasse();
+            masseTotale += m;
             
-//             vector<double> cm = sousBoite->getCentreMasse();
-//             for (int i = 0; i < dimension; i++) {
-//                 centreMasseTotal[i] += m * cm[i];
-//             }
-//         }
-//         sousBoite = sousBoite->getSoeur();
-//     }
+            coord cm = sousBoite->getCentreMasse();
+            for (int i = 0; i < dimension; i++) {
+                centreMasseTotal[i] += m * cm[i];
+            }
+        }
+        sousBoite = sousBoite->getSoeur();
+    }
     
-//     if (masseTotale > 0) {
-//         masse = masseTotale;
-//         for (int i = 0; i < dimension; i++) {
-//             centreMasse[i] = centreMasseTotal[i] / masseTotale;
-//         }
-//     } else {
-//         masse = 0.0;
-//         centreMasse = vector<double>(dimension, 0.0);
-//     }
-// }
+    if (masseTotale > 0) {
+        masse = masseTotale;
+        for (int i = 0; i < dimension; i++) {
+            centreMasse[i] = centreMasseTotal[i] / masseTotale;
+        }
+    } else {
+        masse = 0.0;
+        centreMasse = zeros();
+    }
+}
 
 // Nettoyage des sous-boîtes vides
 void Boite::nettoyerBoitesVides() {
@@ -275,16 +270,14 @@ void Boite::nettoyerBoitesVides() {
 
 // Calcul de la distance entre deux boîtes
 double Boite::calculerDistance(const Boite* autre) const {
-    coord dist;
+    coord dist = zeros();
     coord cm1 = centreMasse;
     coord cm2 = autre->getCentreMasse();
     
-    for (int i = 0; i < dimension; i++) {
+    for (int i = 0; i < D; i++) {
         dist[i] = cm1[i] - cm2[i];
     }
     
-
-
     return norm2(dist);
 }   
 

@@ -17,7 +17,6 @@ private:
     Boite* premiereFille;           // Pointeur vers première sous-boîte
     Boite* soeur;                   // Pointeur vers boîte soeur
     double taille;                  // Taille de la boîte
-    int dimension;                  // 2D ou 3D
     
 public:
     // Constructeurs
