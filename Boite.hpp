@@ -21,7 +21,7 @@ private:
     
 public:
     // Constructeurs
-    Boite(int niv, std::vector<double> cent, double t, int dim = 3);
+    Boite(int niv, coord cent, double t, int dim = 3);
     ~Boite();
     
     // Méthodes principales
