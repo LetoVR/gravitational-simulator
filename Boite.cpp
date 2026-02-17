@@ -11,7 +11,7 @@ Boite::Boite(int niv, coord cent, double t)
     
     centreMasse = zeros();
     masse = 0.0;
-    //particule = nullptr;
+    particule = nullptr;
     premiereFille = nullptr;
     soeur = nullptr;
 }

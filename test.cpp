@@ -5,6 +5,7 @@
 
 // Facteur d'échelle pour convertir les coordonnées 0-1 en pixels écran
 const double SCALE = 800.0;
+const int N = 10; // Nombre de particules pour le test
 
 void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
@@ -63,7 +64,12 @@ int main() {
     Boite racine(0, centreRacine, 1.0); // Niveau 0, taille 1.0, 2D (boîte [0,1]x[0,1])
 
     // Initialisation de quelques particules pour tester l'affichage
-    Particule* systeme = creerSysteme(100); // Crée un système de 10 particules
+    Particule* systeme = creerSysteme(5); // Crée un système de 10 particules
+    Particule * courant = systeme;
+    while(courant && courant->getSuivante() && courant->getSuivante() != systeme) {
+        racine.ajouterParticule(courant); // Ajoute la particule à la boîte racine
+        courant = courant->getSuivante();
+     }
 
     // Boucle principale
     while (window.isOpen()) {
@@ -71,40 +77,42 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
+            
+            // if (event.type == sf::Event::MouseButtonPressed) {
+            //     // 1. Récupération de la position de la souris (conversion en coordonnées 0-1)
+            //     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+            //     double mouseX = static_cast<double>(mousePos.x) / SCALE;
+            //     double mouseY = static_cast<double>(mousePos.y) / SCALE;
+                
+                
+            //     // 2. Recherche de la boîte sous le curseur
+            //     Boite* cible = racine.trouverBoiteTerminale(mouseX, mouseY);
 
-            // petites oscillations des particules pour tester le rendu
-            Particule* courant = systeme;
-            while (courant && courant->getSuivante() && courant->getSuivante() != systeme) {
-                for (int i = 0; i < D; ++i) {
-                    courant->position[i] += 0.01 * (rand() / double(RAND_MAX) - 0.5); // Petite oscillation aléatoire
-                }
-                courant = courant->getSuivante();
-            }
-            
-            if (event.type == sf::Event::MouseButtonPressed) {
-            // 1. Récupération de la position de la souris (conversion en coordonnées 0-1)
-            sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-            double mouseX = static_cast<double>(mousePos.x) / SCALE;
-            double mouseY = static_cast<double>(mousePos.y) / SCALE;
-            
-            
-            // 2. Recherche de la boîte sous le curseur
-            Boite* cible = racine.trouverBoiteTerminale(mouseX, mouseY);
-
-            if (cible != nullptr) {
-                if (event.mouseButton.button == sf::Mouse::Left) {
-                    // Clic gauche : Subdivision
-                    cible->diviserBoite();
-                } 
-                else if (event.mouseButton.button == sf::Mouse::Right) {
-                    // Clic droit : Suppression (Nettoyage)
-                    // Note : Pour supprimer une boite spécifique, il faudrait 
-                    // modifier le parent. Ici, on peut tester ton nettoyeur.
-                    // (Nécessite que estVide() soit implémentée)
-                    racine.nettoyerBoitesVides(); 
-                }
-            }
+            //     if (cible != nullptr) {
+            //         if (event.mouseButton.button == sf::Mouse::Left) {
+            //             // Clic gauche : Subdivision
+            //             cible->diviserBoite();
+            //         } 
+            //         else if (event.mouseButton.button == sf::Mouse::Right) {
+            //             // Clic droit : Suppression (Nettoyage)
+            //             // Note : Pour supprimer une boite spécifique, il faudrait 
+            //             // modifier le parent. Ici, on peut tester ton nettoyeur.
+            //             // (Nécessite que estVide() soit implémentée)
+            //             racine.nettoyerBoitesVides(); 
+            //         }
+            //     }
+            // }
         }
+        //racine.ajouterParticule(courant); // Ajoute la particule à la boîte racine (pour tester l'affichage)
+
+        // petites oscillations des particules pour tester le rendu
+        // 
+        // while (courant && courant->getSuivante() && courant->getSuivante() != systeme) {
+        //     for (int i = 0; i < D; ++i) {
+        //         courant->position[i] += 0.01 * (rand() / double(RAND_MAX) - 0.5); // Petite oscillation aléatoire
+        //     }
+        //     courant = courant->getSuivante();
+        // }
 
         // --- Phase de calcul (Future mise à jour des forces/positions) ---
         // racine.mettreAJourCentreMasse();
@@ -116,9 +124,6 @@ int main() {
         dessinerParticules(window, systeme);
         
         window.display();
-        }
-
-    
     }
     return 0;
 }
