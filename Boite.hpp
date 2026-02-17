@@ -10,8 +10,8 @@
 class Boite {
 private:
     int niveau;                     // Niveau dans la hiérarchie
-    std::vector<double> centre;     // Centre de la boîte (x, y, z)
-    std::vector<double> centreMasse;// Centre de masse des particules contenues
+    coord centre;     // Centre de la boîte (x, y, z)
+    coord centreMasse;// Centre de masse des particules contenues
     double masse;                   // Masse cumulée
     Particule* particule;           // Pointeur vers particule si terminale 
     Boite* premiereFille;           // Pointeur vers première sous-boîte
@@ -33,8 +33,8 @@ public:
     // Getters
     int getNiveau() const { return niveau; }
     double getTaille() const { return taille; }
-    std::vector<double> getCentre() const { return centre; }
-    std::vector<double> getCentreMasse() const { return centreMasse; }
+    coord getCentre() const { return centre; }
+    coord getCentreMasse() const { return centreMasse; }
     double getMasse() const { return masse; }
     Boite* getPremiereFille() const { return premiereFille; }
     Boite* getSoeur() const { return soeur; }
@@ -48,7 +48,7 @@ public:
     bool estTerminale() const;
     bool estVide() const;
     bool contientParticule(const Particule* p) const;
-    std::vector<double> calculerDistance(const Boite* autre) const; //Calcul la distance entre les centres de masse de deux boîtes
+    double calculerDistance(const Boite* autre) const; //Calcul la distance entre les centres de masse de deux boîtes
     void diviserBoite();
     void nettoyerBoitesVides();
     
@@ -59,8 +59,8 @@ public:
 private:
     // Méthodes internes
     bool doitDiviser() const;
-    int getIndiceSousBoite(const std::vector<double>& position) const;
-    std::vector<double> getCentreSousBoite(int indice) const;
+    int getIndiceSousBoite(const coord & position) const;
+    coord getCentreSousBoite(int indice) const;
 };
 
 #endif

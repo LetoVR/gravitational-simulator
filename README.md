@@ -1,5 +1,7 @@
 # Simulation Gravitationnelle
 
+Ligne de compilation de test.cpp : 
+g++ test.cpp Boite.cpp Particule.cpp -o test -lsfml-graphics -lsfml-window -lsfml-system
 
 
 ## Getting started

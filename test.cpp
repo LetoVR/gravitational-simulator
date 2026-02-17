@@ -69,11 +69,6 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed)
                 window.close();
-            
-            // // Interaction de test : Diviser la boîte au clic
-            // if (event.type == sf::Event::MouseButtonPressed) {
-            //     racine.diviserBoite();
-            // }
 
 
             if (event.type == sf::Event::MouseButtonPressed) {
@@ -110,6 +105,9 @@ int main() {
     window.clear(sf::Color::Black);
     
     dessinerStructureBoite(window, &racine);
+    // Affichage des particules
+    
+    dessinerParticules(window, systeme);
     
     window.display();
     }

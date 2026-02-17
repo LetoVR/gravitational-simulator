@@ -274,16 +274,18 @@ void Boite::nettoyerBoitesVides() {
 }
 
 // Calcul de la distance entre deux boîtes
-vector<double> Boite::calculerDistance(const Boite* autre) const {
-    vector<double> dist(dimension);
-    vector<double> cm1 = centreMasse;
-    vector<double> cm2 = autre->getCentreMasse();
+double Boite::calculerDistance(const Boite* autre) const {
+    coord dist;
+    coord cm1 = centreMasse;
+    coord cm2 = autre->getCentreMasse();
     
     for (int i = 0; i < dimension; i++) {
         dist[i] = cm1[i] - cm2[i];
     }
     
-    return dist;
+
+
+    return norm2(dist);
 }   
 
 // Pour l'affichage test 
