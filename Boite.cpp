@@ -113,7 +113,7 @@ void Boite::calculerForces(Boite* autre, double theta) {
     double dist = calculerDistance(autre);
     
     // Critère d'approximation
-    if (autre->estTerminale() || (autre->getTaille() / distance < theta)) {
+    if (dist > theta * (taille + autre->getTaille())) {
         // Formule exacte pour les particules proches
         if (estTerminale() && autre->estTerminale() && particule != nullptr && 
             autre->getParticule() != nullptr && particule != autre->getParticule()) {
@@ -123,7 +123,7 @@ void Boite::calculerForces(Boite* autre, double theta) {
             coord pos2 = autre->getParticule()->getPosition();
             
             double r2 = 0.0;
-            for (int i = 0; i < dimension; i++) {
+            for (int i = 0; i < D; i++) {
                 double diff = pos1[i] - pos2[i];
                 r2 += diff * diff;
             }
@@ -139,7 +139,7 @@ void Boite::calculerForces(Boite* autre, double theta) {
         // Formule approchée pour les boîtes lointaines
         if (estTerminale() && particule != nullptr) {
             double force = particule->getMasse() * autre->getMasse() / 
-                          (distance * distance);
+                          (dist * dist);
             
             // Mise à jour approximative de la force
             // À adapter selon votre implémentation
@@ -163,12 +163,12 @@ void Boite::diviserBoite() {
     double nouvelleTaille = taille / 2.0;
     
     // Création des sous-boîtes (8 en 3D, 4 en 2D)
-    int nbSousBoites = (dimension == 3) ? 8 : 4;
+    int nbSousBoites = (D == 3) ? 8 : 4;
     
     Boite* precedent = nullptr;
     for (int i = 0; i < nbSousBoites; i++) {
         coord nouveauCentre = getCentreSousBoite(i);
-        Boite* nouvelleBoite = new Boite(niveau + 1, nouveauCentre, nouvelleTaille, dimension);
+        Boite* nouvelleBoite = new Boite(niveau + 1, nouveauCentre, nouvelleTaille);
         
         if (i == 0) {
             premiereFille = nouvelleBoite;
@@ -229,7 +229,7 @@ void Boite::mettreAJourCentreMasse() {
             masseTotale += m;
             
             coord cm = sousBoite->getCentreMasse();
-            for (int i = 0; i < dimension; i++) {
+            for (int i = 0; i < D; i++) {
                 centreMasseTotal[i] += m * cm[i];
             }
         }
@@ -238,7 +238,7 @@ void Boite::mettreAJourCentreMasse() {
     
     if (masseTotale > 0) {
         masse = masseTotale;
-        for (int i = 0; i < dimension; i++) {
+        for (int i = 0; i < D; i++) {
             centreMasse[i] = centreMasseTotal[i] / masseTotale;
         }
     } else {
