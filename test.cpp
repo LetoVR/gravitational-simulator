@@ -8,7 +8,7 @@ void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
 
     // Récupération des propriétés de la boîte
-    std::vector<double> centre = b->getCentre();
+    coord centre = b->getCentre();
     double taille = b->getTaille();
 
     // Configuration de la forme (carré)
@@ -57,8 +57,8 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(largeur, hauteur), "Simulation Gravitationnelle - Grille");
 
     // Initialisation de la boîte racine centrée
-    std::vector<double> centreRacine = {largeur / 2.0, hauteur / 2.0};
-    Boite racine(0, centreRacine, 600.0, 2); // Niveau 0, taille 600, 2D
+    coord centreRacine = {largeur / 2.0, hauteur / 2.0};
+    Boite racine(0, centreRacine, 600.0); // Niveau 0, taille 600, 2D
 
     // Initialisation de quelques particules pour tester l'affichage
     Particule* systeme = creerSysteme(10); // Crée un système de 10 particules
