@@ -28,7 +28,7 @@ public:
     // Méthodes principales
     void ajouterParticule(Particule* p);
     void supprimerParticule(Particule* p);
-    void calculerForces(Boite* autre, double theta = 0.5);
+    void calculerForces(Particule* p, double theta = 0.5) const;
     void mettreAJourCentreMasse();
     void mettreAJourArbre(); // Met à jour seulement les boites qui viennent de gagner une nouvelle particule, ou de perdre leur particule
     

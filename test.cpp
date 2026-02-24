@@ -6,6 +6,10 @@
 // Facteur d'échelle pour convertir les coordonnées 0-1 en pixels écran
 const double SCALE = 800.0;
 const int N = 20; // Nombre de particules pour le test
+const int largeur = 800;
+const int hauteur = 800;
+const double dt = 0.001;
+
 
 void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
@@ -55,8 +59,7 @@ void dessinerParticules(sf::RenderWindow& window, const Particule* p) {
 }
 
 int main() {
-    const int largeur = 800;
-    const int hauteur = 800;
+    
     sf::RenderWindow window(sf::VideoMode(largeur, hauteur), "Simulation Gravitationnelle - Grille");
 
     // Conservation du centre de la racine
@@ -80,6 +83,7 @@ int main() {
                 window.close();
         }
 
+        /* Anciennement, on donnait des oscillations aléatoires aux particules pour tester les fonctions
         // 1. Déplacement des particules (pour l'instant de simples oscillations aléatoires)
         Particule* courant = systeme;
         if (courant != nullptr) {
@@ -90,8 +94,32 @@ int main() {
                 courant = courant->getSuivante();
             } while (courant != systeme);
         }
-        
-        // 1.5 Evite les chevauchements visuels
+        */
+
+        // 1. Calcul des forces de gravité
+        Particule* courant = systeme;
+        if (courant != nullptr) {
+            do {
+                // Remise à zéro indispensable avant de cumuler les nouvelles forces
+                courant->force = zeros(); 
+                
+                // Calcul via l'algorithme de Barnes-Hut
+                racine.calculerForces(courant, THETA);
+                
+                courant = courant->getSuivante();
+            } while (courant != systeme);
+        }
+
+        // 2. Mise à jour des positions et vitesses des particules
+        courant = systeme;
+        if (courant != nullptr) {
+            do {
+                courant->saute_mouton(dt);
+                courant = courant->getSuivante();
+            } while (courant != systeme);
+        }
+
+        // 2.5 Evite les chevauchements visuels
         const double DIAMETRE_GRAPHIQUE = 0.0125;
         Particule* p1 = systeme;
         if (p1 != nullptr) {

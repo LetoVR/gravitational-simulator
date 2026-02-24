@@ -107,6 +107,54 @@ void Boite::supprimerParticule(Particule* p) {
     }
 }
 
+
+// Calcul des forces de tout l'arbre sur une particule donnée
+void Boite::calculerForces(Particule* p, double theta) const{
+    if (estVide()) return;
+
+    // Calcul de la distance d entre la particule cible p et le centre de masse de la boîte
+    coord diff = zeros();
+    double d2 = 0.0;
+    for (int i = 0; i < D; ++i) {
+        diff[i] = centreMasse[i] - p->position[i];
+        d2 += diff[i] * diff[i];
+    }
+    double d = std::sqrt(d2);
+
+    // Sécurité : éviter l'auto-interaction si on évalue la boîte contenant la particule elle-même
+    if (d == 0.0) return;
+
+    // Cas 1 : Boîte terminale (interaction exacte particule à particule)
+    if (estTerminale()) {
+        if (particule != nullptr && particule != p) {
+            // Force exacte avec epsilon
+            double forceMagnitude = (G * p->getMasse() * masse) / (d2 + (eps * eps));
+            // Ajout vectoriel (projection sur les axes x, y...)
+            for (int i = 0; i < D; ++i) {
+                p->force[i] += forceMagnitude * (diff[i] / d);
+            }
+        }
+    } 
+    // Cas 2 : Nœud parent (interactions groupées ou approfondissement de l'arbre)
+    else {
+        // Application du Multipole Acceptance Criterion (MAC)
+        if (taille / d < theta) {
+            // Approximation : la boîte est vue comme une masse ponctuelle lointaine
+            double forceMagnitude = (G * p->getMasse() * masse) / (d2 + (eps * eps));
+            for (int i = 0; i < D; ++i) {
+                p->force[i] += forceMagnitude * (diff[i] / d);
+            }
+        } else {
+            // La boîte est trop proche, on l'ouvre et on inspecte ses sous-boîtes
+            Boite* fille = premiereFille;
+            while (fille != nullptr) {
+                fille->calculerForces(p, theta);
+                fille = fille->getSoeur();
+            }
+        }
+    }
+}
+/*
 // Calcul des forces entre boîtes
 void Boite::calculerForces(Boite* autre, double theta) {
     // Si cette boîte est vide, on ne fait rien
@@ -161,6 +209,8 @@ void Boite::calculerForces(Boite* autre, double theta) {
         }
     }
 }
+*/
+
 
 // Division d'une boîte en sous-boîtes
 void Boite::diviserBoite() {
