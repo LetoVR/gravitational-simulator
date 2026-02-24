@@ -17,7 +17,9 @@ private:
     Boite* premiereFille;           // Pointeur vers première sous-boîte
     Boite* soeur;                   // Pointeur vers boîte soeur
     double taille;                  // Taille de la boîte
-    static const int NIVEAU_MAX = 20; // Sécurité algorithmique
+    static const int NIVEAU_MAX = 20; // Niveau maximum pour éviter d'essayer de diviser indéfiniment une boite pour deux particules très proches
+    void recupererParticulesDeplacees(std::vector<Particule*>& a_deplacer); //trouve les particules qui viennent de sortir de leur boîte
+
 public:
     // Constructeurs
     Boite(int niv, coord cent, double t);
@@ -26,8 +28,9 @@ public:
     // Méthodes principales
     void ajouterParticule(Particule* p);
     void supprimerParticule(Particule* p);
-    void calculerForces(Boite* autre, double theta = 0.5);
+    void calculerForces(Particule* p, double theta = 0.5) const;
     void mettreAJourCentreMasse();
+    void mettreAJourArbre(); // Met à jour seulement les boites qui viennent de gagner une nouvelle particule, ou de perdre leur particule
     
     // Getters
     int getNiveau() const { return niveau; }

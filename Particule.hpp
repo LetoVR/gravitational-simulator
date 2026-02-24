@@ -12,7 +12,10 @@
 constexpr int D = 2; //dimension on peut changer en 3, 4...
 using coord = std::array<double, D>; // typedef std::array<double, D> coord pour représenter les coordonnées (position, vitesse, force)
 const double G = 1.0;
-const double eps = 1e-12;
+const double eps = 1; // facteur d'adoucissement pour éviter les singularités
+// Remarque : au plus epsilon est petit au moins la simulation est stable
+const double THETA = 0.5;//Le critère MAC pour déterminer le type d'interaction (exacte ou approx)
+
 
 // Explique ces structure Jude stp - Leto :
 // La structure coord est une structure qui contient un tableau de D doubles, représentant les coordonnées d'un point dans un espace de dimension D. 
