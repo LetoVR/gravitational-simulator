@@ -338,22 +338,23 @@ double Boite::calculerDistance(const Boite* autre) const {
 }   
 
 // Pour identifier les particules qui viennent de sortir de leur boîte.
-bool Boite::contient(double x, double y) const {
-    return (x >= centre[0] - taille / 2.0 && x <= centre[0] + taille / 2.0 &&
-            y >= centre[1] - taille / 2.0 && y <= centre[1] + taille / 2.0);
+bool Boite::contient(const coord& p) const {
+    for (int i = 0; i < D; ++i) {
+        if (p[i] < centre[i] - taille / 2.0 || p[i] > centre[i] + taille / 2.0) {
+            return false; // Hors de la boîte sur cet axe
+        }
+    }
+    return true; // Dans la boîte sur tous les axes
 }
 
-Boite* Boite::trouverBoiteTerminale(double x, double y) {
-    // Si le point n'est pas dans cette boîte, il n'est pas dans ses filles
-    if (!contient(x, y)) return nullptr;
+Boite* Boite::trouverBoiteTerminale(const coord& p) {
+    if (!contient(p)) return nullptr;
 
-    // Si c'est une boîte terminale et qu'elle contient le point, c'est la cible
     if (estTerminale()) return this;
 
-    // Sinon, on cherche récursivement dans les filles
     Boite* fille = premiereFille;
     while (fille != nullptr) {
-        Boite* cible = fille->trouverBoiteTerminale(x, y);
+        Boite* cible = fille->trouverBoiteTerminale(p);
         if (cible != nullptr) return cible;
         fille = fille->getSoeur();
     }
@@ -363,8 +364,8 @@ Boite* Boite::trouverBoiteTerminale(double x, double y) {
 // Parcours récursif pour trouver les particules sorties de leur boîte
 void Boite::recupererParticulesDeplacees(std::vector<Particule*>& a_deplacer) {
     if (estTerminale()) {
-        // Si la boîte contient une particule mais que ses coordonnées n'y sont plus
-        if (particule != nullptr && !contient(particule->position[0], particule->position[1])) {
+        // Remplacer l'ancienne condition par celle-ci :
+        if (particule != nullptr && !contient(particule->position)) {
             a_deplacer.push_back(particule);
         }
     } else {

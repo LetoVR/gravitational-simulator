@@ -56,8 +56,8 @@ public:
     
 
     // Pour l'affichage test
-    bool contient(double x, double y) const;
-    Boite* trouverBoiteTerminale(double x, double y);
+    bool contient(const coord& p) const;
+    Boite* trouverBoiteTerminale(const coord& p);
 private:
     // Méthodes internes
     bool doitDiviser() const;
