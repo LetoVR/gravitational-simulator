@@ -38,13 +38,19 @@ void Boite::ajouterParticule(Particule* p) {
     // Cas 1: Boîte terminale vide
     if (estTerminale() && particule == nullptr) {
         particule = p;
-        masse = p->getMasse();   // getMasse et getPosition à définir par Jude
+        masse = p->getMasse();
         centreMasse = p->getPosition();
         return;
     }
     
     // Cas 2: Boîte terminale déjà occupée
     if (estTerminale() && particule != nullptr) {
+        
+        // Arrêt forcé si la limite de profondeur est atteinte
+        if (niveau >= NIVEAU_MAX) {
+            return; 
+        }
+
         // Sauvegarde de l'ancienne particule
         Particule* ancienneParticule = particule;
         particule = nullptr;

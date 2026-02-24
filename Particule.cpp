@@ -80,8 +80,6 @@ coord forceEntreParticules(const Particule* p1, const Particule* p2) {
     coord F = zeros();
     if (!p1 || !p2) return F;
 
-    const double G = 1.0;
-    const double eps = 1e-12;
 
     // d = r2 - r1 (vecteur en D dimensions)
     coord d = zeros();

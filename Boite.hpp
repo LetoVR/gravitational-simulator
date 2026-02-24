@@ -17,7 +17,7 @@ private:
     Boite* premiereFille;           // Pointeur vers première sous-boîte
     Boite* soeur;                   // Pointeur vers boîte soeur
     double taille;                  // Taille de la boîte
-    
+    static const int NIVEAU_MAX = 20; // Sécurité algorithmique
 public:
     // Constructeurs
     Boite(int niv, coord cent, double t);

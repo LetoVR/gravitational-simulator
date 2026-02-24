@@ -11,7 +11,8 @@
 
 constexpr int D = 2; //dimension on peut changer en 3, 4...
 using coord = std::array<double, D>; // typedef std::array<double, D> coord pour représenter les coordonnées (position, vitesse, force)
-
+const double G = 1.0;
+const double eps = 1e-12;
 
 // Explique ces structure Jude stp - Leto :
 // La structure coord est une structure qui contient un tableau de D doubles, représentant les coordonnées d'un point dans un espace de dimension D. 
