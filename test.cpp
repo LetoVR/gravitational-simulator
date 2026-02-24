@@ -6,6 +6,10 @@
 // Facteur d'échelle pour convertir les coordonnées 0-1 en pixels écran
 const double SCALE = 800.0;
 const int N = 10; // Nombre de particules pour le test
+// Paramètres pour petites oscillations pour tester la màj des boites
+
+const double OSC_AMP = 0.09; // amplitude en coordonnées (0-1) -> *SCALE pour pixels
+const double OSC_FREQ = 6.0; // fréquence (rad/s)
 
 void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
@@ -36,28 +40,44 @@ void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     }
 }
 
-void dessinerParticules(sf::RenderWindow& window, const Particule* p) {
+// Dessine les particules en leur appliquant une petite oscillation visuelle
+void dessinerParticules(sf::RenderWindow& window, const Particule* p, double t) {
     if (p == nullptr) return;
 
-    // Dessiner la particule courante
     sf::CircleShape cercle(5.0f); // Rayon de 5 pixels
     cercle.setFillColor(sf::Color::Red);
-    cercle.setPosition(p->position[0] * SCALE - 5.0f, p->position[1] * SCALE - 5.0f); // Centrer le cercle
-    window.draw(cercle);
 
-    // Dessiner les particules suivantes dans la liste
-    const Particule* suivant = p->getSuivante();
-    while (suivant != nullptr && suivant != p) {
-        cercle.setPosition(suivant->position[0] * SCALE - 5.0f, suivant->position[1] * SCALE - 5.0f);
+    const Particule* courant = p;
+    int idx = 0;
+    do {
+        // Calcul d'un décalage d'affichage sinusoïdal pour rendre les petites oscillations visibles
+        double phase = idx * 0.5; // phase légèrement différente par particule
+        double offset = OSC_AMP * std::sin(OSC_FREQ * t + phase);
+
+        double drawX = courant->position[0] + offset;
+        double drawY = courant->position[1] + offset; // même offset sur x et y pour simplicité
+
+        // Clamp pour rester dans [0,1]
+        if (drawX < 0.0) drawX = 0.0;
+        if (drawX > 1.0) drawX = 1.0;
+        if (drawY < 0.0) drawY = 0.0;
+        if (drawY > 1.0) drawY = 1.0;
+
+        cercle.setPosition(drawX * SCALE - 5.0f, drawY * SCALE - 5.0f);
         window.draw(cercle);
-        suivant = suivant->getSuivante();
-    }
+
+        courant = courant->getSuivante();
+        ++idx;
+    } while (courant && courant != p);
 }
 
 int main() {
     const int largeur = 800;
     const int hauteur = 800;
     sf::RenderWindow window(sf::VideoMode(largeur, hauteur), "Simulation Gravitationnelle - Grille");
+
+    // Horloge pour animer les petites oscillations visuelles
+    sf::Clock clock;
 
     // Initialisation de la boîte racine centrée en coordonnées 0-1
     coord centreRacine = {0.5, 0.5};
@@ -104,23 +124,17 @@ int main() {
             // }
         }
 
-        // petites oscillations des particules pour tester le rendu
-        
-        // while (courant && courant->getSuivante() && courant->getSuivante() != systeme) {
-        //     for (int i = 0; i < D; ++i) {
-        //         courant->position[i] += 0.01 * (rand() / double(RAND_MAX) - 0.5); // Petite oscillation aléatoire
-        //     }
-        //     courant = courant->getSuivante();
-        // }
-
         // --- Phase de calcul (Future mise à jour des forces/positions) ---
         // racine.mettreAJourCentreMasse();
         
         // --- Phase de rendu ---
         window.clear(sf::Color::Black);
         
+        // calcul du temps écoulé pour l'animation visuelle
+        double t = clock.getElapsedTime().asSeconds();
+
         dessinerStructureBoite(window, &racine);
-        dessinerParticules(window, systeme);
+        dessinerParticules(window, systeme, t);
         
         window.display();
     }
