@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cstdlib>   // rand, RAND_MAX
 #include <iostream>
-
+#include <random>
 using namespace std;
 
 //Constructeur
@@ -121,14 +121,56 @@ coord forceTotaleSurParticule(Particule* particule) {
 }
 
 //  Création du système
+// Particule* creerSysteme(int N) {
+//     if (N <= 0) return nullptr;
+
+//     // 1ère particule (tête)
+//     coord p0 = zeros();
+//     coord v0 = zeros();
+//     coord f0 = zeros();
+//     double m0 = 1.0; // tu choisis une masse ici (obligatoire de passer une valeur)
+
+//     Particule* head = new Particule(p0, v0, m0, f0, nullptr);
+//     Particule* courant = head;
+
+//     // autres particules
+//     for (int i = 1; i < N; ++i) {
+//         coord p = zeros();
+//         for (int k = 0; k < D; ++k) {
+//             p[k] = double(rand()) / RAND_MAX;
+//         }
+
+//         coord v = zeros();
+//         coord f = zeros();
+//         double m = 1.0; // ou une valeur aléatoire / lue depuis un fichier
+
+//         Particule* np = new Particule(p, v, m, f, nullptr);
+//         courant->particule_suivante = np;
+//         courant = np;
+//     }
+
+//     // fermer la liste circulaire
+//     courant->particule_suivante = head;
+//     return head;
+// }
+
+// crée un système circulaire de N particules avec positions aléatoires dans [0,1]
 Particule* creerSysteme(int N) {
     if (N <= 0) return nullptr;
 
-    // 1ère particule (tête)
+    // Générateur aléatoire initialisé une seule fois (même si la fonction est appelée plusieurs fois)
+    static std::mt19937 gen(std::random_device{}());
+    static std::uniform_real_distribution<double> dist(0.0, 1.0);
+
+    // 1ère particule (tête) -> aléatoire aussi
     coord p0 = zeros();
+    for (int k = 0; k < D; ++k) {
+        p0[k] = dist(gen);
+    }
+
     coord v0 = zeros();
     coord f0 = zeros();
-    double m0 = 1.0; // tu choisis une masse ici (obligatoire de passer une valeur)
+    double m0 = 1.0;
 
     Particule* head = new Particule(p0, v0, m0, f0, nullptr);
     Particule* courant = head;
@@ -137,12 +179,12 @@ Particule* creerSysteme(int N) {
     for (int i = 1; i < N; ++i) {
         coord p = zeros();
         for (int k = 0; k < D; ++k) {
-            p[k] = double(rand()) / RAND_MAX;
+            p[k] = dist(gen);
         }
 
         coord v = zeros();
         coord f = zeros();
-        double m = 1.0; // ou une valeur aléatoire / lue depuis un fichier
+        double m = 1.0;
 
         Particule* np = new Particule(p, v, m, f, nullptr);
         courant->particule_suivante = np;
@@ -151,5 +193,6 @@ Particule* creerSysteme(int N) {
 
     // fermer la liste circulaire
     courant->particule_suivante = head;
+
     return head;
 }
