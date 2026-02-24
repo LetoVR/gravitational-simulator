@@ -103,10 +103,9 @@ int main() {
             //     }
             // }
         }
-        //racine.ajouterParticule(courant); // Ajoute la particule à la boîte racine (pour tester l'affichage)
 
         // petites oscillations des particules pour tester le rendu
-        // 
+        
         // while (courant && courant->getSuivante() && courant->getSuivante() != systeme) {
         //     for (int i = 0; i < D; ++i) {
         //         courant->position[i] += 0.01 * (rand() / double(RAND_MAX) - 0.5); // Petite oscillation aléatoire
