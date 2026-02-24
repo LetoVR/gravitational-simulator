@@ -158,3 +158,15 @@ Particule* creerSysteme(int N) {
 
     return head;
 }
+
+// Destruction du système (libération de la mémoire)
+void detruireSysteme(Particule* systeme) {
+    if (systeme == nullptr) return;
+
+    Particule* courant = systeme;
+    do {
+        Particule* a_supprimer = courant;
+        courant = courant->particule_suivante;
+        delete a_supprimer;
+    } while (courant != systeme);
+}

@@ -65,5 +65,7 @@ public:
 coord forceEntreParticules(const Particule* p1, const Particule* p2);// Calcule la force gravitationnelle exercée entre deux particules
 coord forceTotaleSurParticule(Particule* particule);// Calcule la force totale exercée sur une particule par toutes les autres particules de la liste chaînée
 Particule* creerSysteme(int N);// Crée un système de N particules avec des positions aléatoires, des vitesses initiales à zéro et des masses égales à 1.0
+void detruireSysteme(Particule* systeme);// Cette fonction libère la mémoire allouée pour les particules du système. 
+
 
 #endif // PARTICULE_HPP

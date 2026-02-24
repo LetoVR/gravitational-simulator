@@ -5,7 +5,7 @@
 
 // Facteur d'échelle pour convertir les coordonnées 0-1 en pixels écran
 const double SCALE = 800.0;
-const int N = 10; // Nombre de particules pour le test
+const int N = 20; // Nombre de particules pour le test
 
 void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
     if (b == nullptr) return;
@@ -81,6 +81,37 @@ int main() {
                 courant = courant->getSuivante();
             } while (courant != systeme);
         }
+        
+        // 1.5 Evite les chevauchements visuels
+        const double DIAMETRE_GRAPHIQUE = 0.0125;
+        Particule* p1 = systeme;
+        if (p1 != nullptr) {
+            do {
+                Particule* p2 = p1->getSuivante();
+                while (p2 != nullptr && p2 != systeme) {
+                    coord diff = zeros();
+                    double dist2 = 0.0;
+                    for (int i = 0; i < D; ++i) {
+                        diff[i] = p1->position[i] - p2->position[i];
+                        dist2 += diff[i] * diff[i];
+                    }
+                    
+                    if (dist2 > 0 && dist2 < DIAMETRE_GRAPHIQUE * DIAMETRE_GRAPHIQUE) {
+                        double dist = std::sqrt(dist2);
+                        double chevauchement = DIAMETRE_GRAPHIQUE - dist;
+                        
+                        // Séparation symétrique pour repousser les deux particules
+                        for (int i = 0; i < D; ++i) {
+                            double decalage = (diff[i] / dist) * (chevauchement * 0.5);
+                            p1->position[i] += decalage;
+                            p2->position[i] -= decalage;
+                        }
+                    }
+                    p2 = p2->getSuivante();
+                }
+                p1 = p1->getSuivante();
+            } while (p1 != systeme);
+        }
 
         // 2. Réinitialisation et reconstruction de l'arbre à chaque itération
         Boite racine(0, centreRacine, 1.0);
@@ -101,5 +132,6 @@ int main() {
         window.display();
     }
     
+    detruireSysteme(systeme); // Libération de la mémoire allouée pour les particules
     return 0;
 }
