@@ -61,8 +61,17 @@ int main() {
 
     // Conservation du centre de la racine
     coord centreRacine = {0.5, 0.5};
-
+    Boite racine(0, centreRacine, 1.0);
     Particule* systeme = creerSysteme(N);
+    
+    Particule* courantInit = systeme;
+    if (courantInit != nullptr) {
+        do {
+            racine.ajouterParticule(courantInit);
+            courantInit = courantInit->getSuivante();
+        } while (courantInit != systeme);
+    }
+
 
     while (window.isOpen()) {
         sf::Event event;
@@ -71,7 +80,7 @@ int main() {
                 window.close();
         }
 
-        // 1. Déplacement des particules (parcours complet de la liste circulaire)
+        // 1. Déplacement des particules (pour l'instant de simples oscillations aléatoires)
         Particule* courant = systeme;
         if (courant != nullptr) {
             do {
@@ -113,15 +122,9 @@ int main() {
             } while (p1 != systeme);
         }
 
-        // 2. Réinitialisation et reconstruction de l'arbre à chaque itération
-        Boite racine(0, centreRacine, 1.0);
-        courant = systeme;
-        if (courant != nullptr) {
-            do {
-                racine.ajouterParticule(courant);
-                courant = courant->getSuivante();
-            } while (courant != systeme);
-        }
+        // 2. Mise à jour de l'arbre, seulement pour les boîtes qui ont vu leurs particules bouger
+        racine.mettreAJourArbre();
+        
 
         // --- Phase de rendu ---
         window.clear(sf::Color::Black);

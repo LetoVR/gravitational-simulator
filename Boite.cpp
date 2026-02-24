@@ -287,7 +287,7 @@ double Boite::calculerDistance(const Boite* autre) const {
     return norm2(dist);
 }   
 
-// Pour l'affichage test 
+// Pour identifier les particules qui viennent de sortir de leur boîte.
 bool Boite::contient(double x, double y) const {
     return (x >= centre[0] - taille / 2.0 && x <= centre[0] + taille / 2.0 &&
             y >= centre[1] - taille / 2.0 && y <= centre[1] + taille / 2.0);
@@ -308,4 +308,37 @@ Boite* Boite::trouverBoiteTerminale(double x, double y) {
         fille = fille->getSoeur();
     }
     return nullptr;
+}
+
+// Parcours récursif pour trouver les particules sorties de leur boîte
+void Boite::recupererParticulesDeplacees(std::vector<Particule*>& a_deplacer) {
+    if (estTerminale()) {
+        // Si la boîte contient une particule mais que ses coordonnées n'y sont plus
+        if (particule != nullptr && !contient(particule->position[0], particule->position[1])) {
+            a_deplacer.push_back(particule);
+        }
+    } else {
+        Boite* fille = premiereFille;
+        while (fille != nullptr) {
+            fille->recupererParticulesDeplacees(a_deplacer);
+            fille = fille->getSoeur();
+        }
+    }
+}
+
+// Fonction globale de mise à jour à appeler depuis le main
+void Boite::mettreAJourArbre() {
+    std::vector<Particule*> a_deplacer;
+    
+    // 1. Lister les particules hors limites
+    recupererParticulesDeplacees(a_deplacer);
+    
+    // 2. Déplacer dynamiquement les particules concernées
+    for (Particule* p : a_deplacer) {
+        supprimerParticule(p);
+        ajouterParticule(p);
+    }
+    
+    // 3. Recalculer les centres de masse de l'ensemble de l'arbre
+    mettreAJourCentreMasse();
 }
