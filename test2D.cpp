@@ -20,7 +20,7 @@ void dessinerStructureBoite(sf::RenderWindow& window, const Boite* b) {
 
     // Configuration de la forme (carré)
     sf::RectangleShape rectangle(sf::Vector2f(taille * SCALE, taille * SCALE));
-    // SFML utilise le coin supérieur gauche, on convertit depuis le centre
+    // Placement du triangle (SFML utilise le coin en haut à gauche, donc il faut adapter)
     rectangle.setPosition((centre[0] - taille / 2.0) * SCALE, (centre[1] - taille / 2.0) * SCALE);
     
     // Style : Bordures uniquement pour voir la grille
