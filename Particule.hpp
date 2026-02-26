@@ -9,7 +9,7 @@
 #include <cstdlib>  
 #include <random>
 
-constexpr int D = 2; //dimension on peut changer en 3, 4...
+constexpr int D = 3; //dimension on peut changer en 3, 4...
 using coord = std::array<double, D>; // typedef std::array<double, D> coord pour représenter les coordonnées (position, vitesse, force)
 const double G = 1.0;
 const double eps = 1; // facteur d'adoucissement pour éviter les singularités
