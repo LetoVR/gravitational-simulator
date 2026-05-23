@@ -25,17 +25,16 @@ The opening parameter θ controls the trade-off between accuracy and
 performance. A smaller θ gives more accurate results at higher 
 computational cost.
 
-## Project Structure
-gravitational-simulator/
-├── src/
-│   ├── Particule.hpp / Particule.cpp   # Particle class and linked list
-│   ├── Boite.hpp / Boite.cpp           # Barnes-Hut tree (box/node)
-│   ├── main.hpp / main.cpp             # Entry point
-│   ├── test2D.cpp                      # 2D simulation with SFML
-│   └── test3D.cpp                      # 3D simulation with Raylib
-├── report/
-│   └── report.pdf                      # Full project report (French)
-└── README.md
+## Repository Structure
+
+- `src/` — source code
+  - `Particule.hpp / Particule.cpp` — Particle class and linked list
+  - `Boite.hpp / Boite.cpp` — Barnes-Hut tree (box/node)
+  - `main.hpp / main.cpp` — Entry point
+  - `test2D.cpp` — 2D simulation with SFML
+  - `test3D.cpp` — 3D simulation with Raylib
+- `report/report.pdf` — Full project report (French)
+- `README.md`
 
 ## Dependencies
 
